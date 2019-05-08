@@ -32,7 +32,7 @@ extern "C" {
 
 // An array of references that need to be restored from the sysimg
 // This is a manually constructed dual of the gvars array, which would be produced by codegen for Julia code, for C.
-static const void *const _tags[] = {
+static void *const _tags[] = {
          // builtin types
          &jl_any_type, &jl_symbol_type, &jl_ssavalue_type, &jl_datatype_type, &jl_slotnumber_type,
          &jl_simplevector_type, &jl_array_type, &jl_typedslot_type,
@@ -1190,7 +1190,6 @@ static void jl_finalize_serializer(jl_serializer_state *s)
 }
 
 
-void jl_typemap_rehash(jl_typemap_t *ml, int8_t offs);
 static void jl_reinit_item(jl_value_t *v, int how)
 {
     switch (how) {
@@ -1375,14 +1374,6 @@ static void jl_save_system_image_to_stream(ios_t *f)
 
     { // step 4: record locations of special roots
         s.s = f;
-        // save module initialization order
-        if (jl_module_init_order != NULL) {
-            size_t i, l = jl_array_len(jl_module_init_order);
-            for (i = 0; i < l; i++) {
-                // verify that all these modules were saved
-                assert(ptrhash_get(&backref_table, jl_array_ptr_ref(jl_module_init_order, i)) != HT_NOTFOUND);
-            }
-        }
         size_t i;
         for (i = 0; tags[i] != NULL; i++) {
             jl_value_t *tag = *tags[i];

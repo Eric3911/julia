@@ -623,8 +623,7 @@ void jl_assign_bits(void *dest, jl_value_t *bits)
 
 #define PERMBOXN_FUNC(nb,nw)                                            \
     jl_value_t *jl_permbox##nb(jl_datatype_t *t, int##nb##_t x)         \
-    {                                                                   \
-        /*assert(jl_isbits(t));*/                                       \
+    {   /* NOTE: t must be a concrete isbits datatype */                \
         assert(jl_datatype_size(t) == sizeof(x));                       \
         jl_value_t *v = jl_gc_permobj(nw * sizeof(void*), t);           \
         *(int##nb##_t*)jl_data_ptr(v) = x;                              \
