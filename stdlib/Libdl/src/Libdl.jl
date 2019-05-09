@@ -114,6 +114,23 @@ function dlopen(s::AbstractString, flags::Integer = RTLD_LAZY | RTLD_DEEPBIND; t
 end
 
 """
+    dlopen(f::Function, args...; kwargs...)
+
+Wrapper for usage with `do` blocks to automatically close the dynamic library once
+control flow leaves the `do` block scope.  Example:
+
+
+"""
+function dlopen(f::Function, args...; kwargs...)
+    try
+        hdl = dlopen(args...; kwargs...)
+        f(hdl)
+    finally
+        dlclose(hdl)
+    end
+end
+
+"""
     dlopen_e(libfile::AbstractString [, flags::Integer])
 
 Similar to [`dlopen`](@ref), except returns `C_NULL` instead of raising errors.
